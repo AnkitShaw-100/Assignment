@@ -45,7 +45,7 @@ export function CreateEventPage({
       setStatusMessage("Event created successfully.");
     } catch (error) {
       setStatusMessage(
-        error instanceof Error ? error.message : "Event creation failed."
+        error instanceof Error ? error.message : "Event creation failed.",
       );
     }
   }

@@ -30,7 +30,7 @@ export function OrganizerAuthPage({
       setStatusMessage(
         error instanceof Error
           ? error.message
-          : "Organizer registration failed."
+          : "Organizer registration failed.",
       );
     }
   }
@@ -48,7 +48,7 @@ export function OrganizerAuthPage({
       navigate("/organizer/events");
     } catch (error) {
       setStatusMessage(
-        error instanceof Error ? error.message : "Organizer login failed."
+        error instanceof Error ? error.message : "Organizer login failed.",
       );
     }
   }
@@ -82,9 +82,9 @@ export function OrganizerAuthPage({
         <div className="row">
           <button type="submit">Register</button>
           {/* Added button-secondary class here */}
-          <button 
-            type="button" 
-            className="button-secondary" 
+          <button
+            type="button"
+            className="button-secondary"
             onClick={() => void loginOrganizer()}
           >
             Login

@@ -27,7 +27,7 @@ export function OrganizerEventsPage({
       setStatusMessage(`Loaded ${data.events?.length || 0} events.`);
     } catch (error) {
       setStatusMessage(
-        error instanceof Error ? error.message : "Failed to load events."
+        error instanceof Error ? error.message : "Failed to load events.",
       );
     } finally {
       setLoading(false);

@@ -41,7 +41,9 @@ export function PublicEventPage({ setStatusMessage }: PublicEventPageProps) {
       setStatusMessage("Event details loaded.");
     } catch (error) {
       setStatusMessage(
-        error instanceof Error ? error.message : "Failed to load event details."
+        error instanceof Error
+          ? error.message
+          : "Failed to load event details.",
       );
     } finally {
       setLoading(false);
@@ -65,7 +67,7 @@ export function PublicEventPage({ setStatusMessage }: PublicEventPageProps) {
           method: "POST",
           headers: buildHeaders(),
           body: JSON.stringify(form),
-        }
+        },
       );
       const data = await parseResponse<{ message?: string }>(response);
       setStatusMessage(data.message || "Registration submitted successfully.");
@@ -75,7 +77,7 @@ export function PublicEventPage({ setStatusMessage }: PublicEventPageProps) {
       setStatusMessage(
         error instanceof Error
           ? error.message
-          : "Failed to submit registration."
+          : "Failed to submit registration.",
       );
     }
   }

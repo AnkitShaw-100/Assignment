@@ -21,7 +21,7 @@ type RegistrationRow = RegistrationModel & {
 
 function isActionActive(
   status: RegistrationStatus,
-  action: "approve" | "reject" | "revoke"
+  action: "approve" | "reject" | "revoke",
 ) {
   if (action === "approve") {
     return status === "approved" || status === "registered";
@@ -51,13 +51,13 @@ export function ReviewRegistrationsPage({
         headers: buildHeaders({ includeJson: false }),
       });
       const eventsData = await parseResponse<{ events: EventModel[] }>(
-        eventsResponse
+        eventsResponse,
       );
       setEventOptions(
         (eventsData.events ?? []).map((eventModel) => ({
           id: eventModel._id,
           title: eventModel.title,
-        }))
+        })),
       );
 
       const registrationRows: RegistrationRow[] = [];
@@ -69,7 +69,7 @@ export function ReviewRegistrationsPage({
               method: "GET",
               credentials: "include",
               headers: buildHeaders({ includeJson: false }),
-            }
+            },
           );
           const data = await parseResponse<{
             registrations: RegistrationModel[];
@@ -82,16 +82,18 @@ export function ReviewRegistrationsPage({
               eventRegistrationMode: eventModel.registrationMode,
             });
           }
-        })
+        }),
       );
 
       setRegistrations(registrationRows);
       setStatusMessage(
-        `Loaded ${registrationRows.length} registrations across all events.`
+        `Loaded ${registrationRows.length} registrations across all events.`,
       );
     } catch (error) {
       setStatusMessage(
-        error instanceof Error ? error.message : "Failed to load registrations."
+        error instanceof Error
+          ? error.message
+          : "Failed to load registrations.",
       );
     } finally {
       setLoading(false);
@@ -101,7 +103,7 @@ export function ReviewRegistrationsPage({
   async function changeStatus(
     eventId: string,
     registrationId: string,
-    action: "approve" | "reject" | "revoke"
+    action: "approve" | "reject" | "revoke",
   ) {
     try {
       const response = await fetch(
@@ -110,7 +112,7 @@ export function ReviewRegistrationsPage({
           method: "PATCH",
           credentials: "include",
           headers: buildHeaders({ includeJson: false }),
-        }
+        },
       );
       const data = await parseResponse<{ message?: string }>(response);
       setStatusMessage(data.message ?? `Registration ${action}d successfully.`);
@@ -119,7 +121,7 @@ export function ReviewRegistrationsPage({
       setStatusMessage(
         error instanceof Error
           ? error.message
-          : `Failed to ${action} registration.`
+          : `Failed to ${action} registration.`,
       );
     }
   }
@@ -133,7 +135,7 @@ export function ReviewRegistrationsPage({
       return registrations;
     }
     return registrations.filter(
-      (registration) => registration.eventId === selectedEventId
+      (registration) => registration.eventId === selectedEventId,
     );
   }, [registrations, selectedEventId]);
 
@@ -187,15 +189,15 @@ export function ReviewRegistrationsPage({
                         {(() => {
                           const approveActive = isActionActive(
                             registration.status,
-                            "approve"
+                            "approve",
                           );
                           const rejectActive = isActionActive(
                             registration.status,
-                            "reject"
+                            "reject",
                           );
                           const revokeActive = isActionActive(
                             registration.status,
-                            "revoke"
+                            "revoke",
                           );
                           return (
                             <>
@@ -208,7 +210,7 @@ export function ReviewRegistrationsPage({
                                   void changeStatus(
                                     registration.eventId,
                                     registration._id,
-                                    "approve"
+                                    "approve",
                                   )
                                 }
                               >
@@ -223,7 +225,7 @@ export function ReviewRegistrationsPage({
                                   void changeStatus(
                                     registration.eventId,
                                     registration._id,
-                                    "reject"
+                                    "reject",
                                   )
                                 }
                               >
@@ -238,7 +240,7 @@ export function ReviewRegistrationsPage({
                                   void changeStatus(
                                     registration.eventId,
                                     registration._id,
-                                    "revoke"
+                                    "revoke",
                                   )
                                 }
                               >
