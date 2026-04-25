@@ -1,45 +1,49 @@
-import { useEffect, useState } from 'react'
-import { buildHeaders, getApiBase, parseResponse } from '../lib/api'
-import type { EventModel } from '../types'
+import { useEffect, useState } from "react";
+import { buildHeaders, getApiBase, parseResponse } from "../lib/api";
+import type { EventModel } from "../types";
 
 type OrganizerEventsPageProps = {
-  setStatusMessage: (value: string) => void
-}
+  setStatusMessage: (value: string) => void;
+};
 
-const API_BASE = getApiBase()
+const API_BASE = getApiBase();
 
-export function OrganizerEventsPage({ setStatusMessage }: OrganizerEventsPageProps) {
-  const [events, setEvents] = useState<EventModel[]>([])
-  const [loading, setLoading] = useState(false)
+export function OrganizerEventsPage({
+  setStatusMessage,
+}: OrganizerEventsPageProps) {
+  const [events, setEvents] = useState<EventModel[]>([]);
+  const [loading, setLoading] = useState(false);
 
   async function loadEvents() {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE}/api/events/mine`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: buildHeaders({ includeJson: false })
-      })
-      const data = await parseResponse<{ events: EventModel[] }>(response)
-      setEvents(data.events || [])
-      setStatusMessage(`Loaded ${data.events?.length || 0} events.`)
+        method: "GET",
+        credentials: "include",
+        headers: buildHeaders({ includeJson: false }),
+      });
+      const data = await parseResponse<{ events: EventModel[] }>(response);
+      setEvents(data.events || []);
+      setStatusMessage(`Loaded ${data.events?.length || 0} events.`);
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Failed to load events.')
+      setStatusMessage(
+        error instanceof Error ? error.message : "Failed to load events."
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    void loadEvents()
-  }, [])
+    void loadEvents();
+  }, []);
 
   return (
     <section className="card page-card wide">
       <h2>My Events</h2>
       <div className="row">
         <button type="button" onClick={() => void loadEvents()}>
-          {loading ? 'Loading...' : 'Refresh'}
+          {loading ? "Loading..." : "Refresh"}
         </button>
       </div>
 
@@ -65,14 +69,18 @@ export function OrganizerEventsPage({ setStatusMessage }: OrganizerEventsPagePro
                 <tr key={event._id}>
                   <td>{event.title}</td>
                   <td>{event.status}</td>
-                  <td title={event.webhookLastError || ''}>
-                    {event.webhookDeliveryStatus || 'not_configured'}
-                    {event.webhookLastError ? ' (check tooltip)' : ''}
+                  <td title={event.webhookLastError || ""}>
+                    {event.webhookDeliveryStatus || "not_configured"}
+                    {event.webhookLastError ? " (check tooltip)" : ""}
                   </td>
                   <td>{event.registrationMode}</td>
                   <td>{event.capacity}</td>
                   <td>
-                    <a href={`/events/${event.slug}`} target="_blank" rel="noreferrer">
+                    <a
+                      href={`/events/${event.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       {`${window.location.origin}/events/${event.slug}`}
                     </a>
                   </td>
@@ -83,5 +91,5 @@ export function OrganizerEventsPage({ setStatusMessage }: OrganizerEventsPagePro
         </table>
       </div>
     </section>
-  )
+  );
 }

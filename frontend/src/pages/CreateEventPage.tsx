@@ -1,50 +1,52 @@
-import { useState } from 'react'
-import { buildHeaders, getApiBase, parseResponse } from '../lib/api'
-import type { EventModel, EventStatus, RegistrationMode } from '../types'
+import { useState } from "react";
+import { buildHeaders, getApiBase, parseResponse } from "../lib/api";
+import type { EventModel, EventStatus, RegistrationMode } from "../types";
 
 type CreateEventPageProps = {
-  setStatusMessage: (value: string) => void
-  createdEvent: EventModel | null
-  setCreatedEvent: (event: EventModel | null) => void
-}
+  setStatusMessage: (value: string) => void;
+  createdEvent: EventModel | null;
+  setCreatedEvent: (event: EventModel | null) => void;
+};
 
-const API_BASE = getApiBase()
+const API_BASE = getApiBase();
 
 export function CreateEventPage({
   setStatusMessage,
   createdEvent,
-  setCreatedEvent
+  setCreatedEvent,
 }: CreateEventPageProps) {
   const initialFormState = {
-    title: '',
-    description: '',
-    date: '',
-    venue: '',
-    mode: 'offline',
+    title: "",
+    description: "",
+    date: "",
+    venue: "",
+    mode: "offline",
     capacity: 50,
-    registrationMode: 'open' as RegistrationMode,
-    status: 'published' as EventStatus
-  }
+    registrationMode: "open" as RegistrationMode,
+    status: "published" as EventStatus,
+  };
 
   const [form, setForm] = useState({
-    ...initialFormState
-  })
+    ...initialFormState,
+  });
 
   async function createEvent(event: React.FormEvent) {
-    event.preventDefault()
+    event.preventDefault();
     try {
       const response = await fetch(`${API_BASE}/api/events`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
         headers: buildHeaders(),
-        body: JSON.stringify(form)
-      })
-      const data = await parseResponse<{ event: EventModel }>(response)
-      setCreatedEvent(data.event)
-      setForm({ ...initialFormState })
-      setStatusMessage('Event created successfully.')
+        body: JSON.stringify(form),
+      });
+      const data = await parseResponse<{ event: EventModel }>(response);
+      setCreatedEvent(data.event);
+      setForm({ ...initialFormState });
+      setStatusMessage("Event created successfully.");
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Event creation failed.')
+      setStatusMessage(
+        error instanceof Error ? error.message : "Event creation failed."
+      );
     }
   }
 
@@ -55,35 +57,51 @@ export function CreateEventPage({
         <input
           placeholder="Title"
           value={form.title}
-          onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, title: event.target.value }))
+          }
         />
         <textarea
           placeholder="Description"
           value={form.description}
-          onChange={(event) => setForm((prev) => ({ ...prev, description: event.target.value }))}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, description: event.target.value }))
+          }
         />
         <input
           type="datetime-local"
           value={form.date}
-          onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, date: event.target.value }))
+          }
         />
         <input
           placeholder="Venue"
           value={form.venue}
-          onChange={(event) => setForm((prev) => ({ ...prev, venue: event.target.value }))}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, venue: event.target.value }))
+          }
         />
         <input
           type="number"
           min={1}
           placeholder="Capacity"
           value={form.capacity}
-          onChange={(event) => setForm((prev) => ({ ...prev, capacity: Number(event.target.value) || 0 }))}
+          onChange={(event) =>
+            setForm((prev) => ({
+              ...prev,
+              capacity: Number(event.target.value) || 0,
+            }))
+          }
         />
         <div className="row">
           <select
             value={form.registrationMode}
             onChange={(event) =>
-              setForm((prev) => ({ ...prev, registrationMode: event.target.value as RegistrationMode }))
+              setForm((prev) => ({
+                ...prev,
+                registrationMode: event.target.value as RegistrationMode,
+              }))
             }
           >
             <option value="open">Open</option>
@@ -91,7 +109,12 @@ export function CreateEventPage({
           </select>
           <select
             value={form.status}
-            onChange={(event) => setForm((prev) => ({ ...prev, status: event.target.value as EventStatus }))}
+            onChange={(event) =>
+              setForm((prev) => ({
+                ...prev,
+                status: event.target.value as EventStatus,
+              }))
+            }
           >
             <option value="published">Published</option>
             <option value="draft">Draft</option>
@@ -109,5 +132,5 @@ export function CreateEventPage({
         </div>
       ) : null}
     </section>
-  )
+  );
 }

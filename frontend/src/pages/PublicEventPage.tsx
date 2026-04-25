@@ -1,69 +1,82 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { buildHeaders, getApiBase, parseResponse } from '../lib/api'
-import type { EventModel } from '../types'
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { buildHeaders, getApiBase, parseResponse } from "../lib/api";
+import type { EventModel } from "../types";
 
 type PublicEventPageProps = {
-  setStatusMessage: (value: string) => void
-}
+  setStatusMessage: (value: string) => void;
+};
 
 type PublicEventResponse = {
-  event: EventModel
-  registeredCount: number
-  availableSpots: number
-}
+  event: EventModel;
+  registeredCount: number;
+  availableSpots: number;
+};
 
-const API_BASE = getApiBase()
+const API_BASE = getApiBase();
 
 export function PublicEventPage({ setStatusMessage }: PublicEventPageProps) {
-  const { slug } = useParams<{ slug: string }>()
-  const [eventData, setEventData] = useState<PublicEventResponse | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({ attendeeName: '', attendeeEmail: '', phone: '' })
+  const { slug } = useParams<{ slug: string }>();
+  const [eventData, setEventData] = useState<PublicEventResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    attendeeName: "",
+    attendeeEmail: "",
+    phone: "",
+  });
 
   async function loadPublicEventDetails() {
     if (!slug) {
-      return
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE}/api/events/public/${slug}`, {
-        method: 'GET',
-        headers: buildHeaders({ includeJson: false })
-      })
-      const data = await parseResponse<PublicEventResponse>(response)
-      setEventData(data)
-      setStatusMessage('Event details loaded.')
+        method: "GET",
+        headers: buildHeaders({ includeJson: false }),
+      });
+      const data = await parseResponse<PublicEventResponse>(response);
+      setEventData(data);
+      setStatusMessage("Event details loaded.");
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Failed to load event details.')
+      setStatusMessage(
+        error instanceof Error ? error.message : "Failed to load event details."
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    void loadPublicEventDetails()
-  }, [slug])
+    void loadPublicEventDetails();
+  }, [slug]);
 
   async function submitRegistration(event: React.FormEvent) {
-    event.preventDefault()
+    event.preventDefault();
     if (!slug) {
-      return
+      return;
     }
 
     try {
-      const response = await fetch(`${API_BASE}/api/events/public/${slug}/register`, {
-        method: 'POST',
-        headers: buildHeaders(),
-        body: JSON.stringify(form)
-      })
-      const data = await parseResponse<{ message?: string }>(response)
-      setStatusMessage(data.message || 'Registration submitted successfully.')
-      setForm({ attendeeName: '', attendeeEmail: '', phone: '' })
-      await loadPublicEventDetails()
+      const response = await fetch(
+        `${API_BASE}/api/events/public/${slug}/register`,
+        {
+          method: "POST",
+          headers: buildHeaders(),
+          body: JSON.stringify(form),
+        }
+      );
+      const data = await parseResponse<{ message?: string }>(response);
+      setStatusMessage(data.message || "Registration submitted successfully.");
+      setForm({ attendeeName: "", attendeeEmail: "", phone: "" });
+      await loadPublicEventDetails();
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Failed to submit registration.')
+      setStatusMessage(
+        error instanceof Error
+          ? error.message
+          : "Failed to submit registration."
+      );
     }
   }
 
@@ -79,13 +92,15 @@ export function PublicEventPage({ setStatusMessage }: PublicEventPageProps) {
             <strong>Title:</strong> {eventData.event.title}
           </p>
           <p>
-            <strong>Description:</strong> {eventData.event.description || 'No description provided.'}
+            <strong>Description:</strong>{" "}
+            {eventData.event.description || "No description provided."}
           </p>
           <p>
-            <strong>Date:</strong> {new Date(eventData.event.date).toLocaleString()}
+            <strong>Date:</strong>{" "}
+            {new Date(eventData.event.date).toLocaleString()}
           </p>
           <p>
-            <strong>Venue:</strong> {eventData.event.venue || 'Not specified'}
+            <strong>Venue:</strong> {eventData.event.venue || "Not specified"}
           </p>
           <p>
             <strong>Status:</strong> {eventData.event.status}
@@ -106,20 +121,26 @@ export function PublicEventPage({ setStatusMessage }: PublicEventPageProps) {
         <input
           placeholder="Your name"
           value={form.attendeeName}
-          onChange={(event) => setForm((prev) => ({ ...prev, attendeeName: event.target.value }))}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, attendeeName: event.target.value }))
+          }
         />
         <input
           placeholder="Your email"
           value={form.attendeeEmail}
-          onChange={(event) => setForm((prev) => ({ ...prev, attendeeEmail: event.target.value }))}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, attendeeEmail: event.target.value }))
+          }
         />
         <input
           placeholder="Phone"
           value={form.phone}
-          onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
+          onChange={(event) =>
+            setForm((prev) => ({ ...prev, phone: event.target.value }))
+          }
         />
         <button type="submit">Register for this event</button>
       </form>
     </section>
-  )
+  );
 }

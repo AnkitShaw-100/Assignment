@@ -49,18 +49,26 @@ export function RsvpPage({ setStatusMessage, rsvpEventId, setRsvpEventId }: Rsvp
     <section className="card page-card">
       <h2>Attendee RSVP</h2>
       <form className="stack" onSubmit={submitRegistration}>
-        <input placeholder="Event id" value={rsvpEventId} onChange={(event) => setRsvpEventId(event.target.value)} />
+        {/* Made this input readOnly so users don't accidentally edit the auto-populated ID */}
+        <input 
+          placeholder="Event id" 
+          value={rsvpEventId} 
+          readOnly={!!rsvpEventId} // Locks the field if an ID exists
+          onChange={(event) => setRsvpEventId(event.target.value)} 
+        />
         <input
           placeholder="Attendee name"
           value={form.attendeeName}
           onChange={(event) => setForm((prev) => ({ ...prev, attendeeName: event.target.value }))}
         />
         <input
+          type="email" /* Changed to type="email" for mobile keyboard optimization */
           placeholder="Attendee email"
           value={form.attendeeEmail}
           onChange={(event) => setForm((prev) => ({ ...prev, attendeeEmail: event.target.value }))}
         />
         <input
+          type="tel" /* Changed to type="tel" for mobile keyboard optimization */
           placeholder="Phone"
           value={form.phone}
           onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}

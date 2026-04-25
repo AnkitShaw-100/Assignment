@@ -1,13 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;600&display=swap');
 
 :root {
-  --line: #d3d9cf;
-  --text: #1f2729;
-  --canvas: #f2eee3;
-  --canvas-alt: #e8decb;
+  /* Palette */
+  --canvas:       #F5EFE0;   /* warmer, creamier base */
+  --canvas-alt:   #EDE4D0;   /* deeper warm gradient end */
+  --line:         #D8D0BF;   /* slightly richer border tone */
+  --text:         #2C3639;   /* deep charcoal-teal — softer than near-black */
+  --text-muted:   #7A6A50;   /* warm mid-tone for secondary content */
+  --accent:       #B85C2A;   /* terracotta — rich and grounded */
+  --accent-cool:  #1A4A5C;   /* deep teal — for contrast moments */
+  --surface:      #FBF7EE;   /* card/inset surfaces */
+
   font-family: 'Manrope', 'Segoe UI', sans-serif;
   font-size: 16px;
-  line-height: 1.45;
+  line-height: 1.55;
   color: var(--text);
 }
 
@@ -18,9 +24,9 @@
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 10% 0%, rgba(247, 166, 0, 0.22), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(16, 74, 89, 0.18), transparent 30%),
-    linear-gradient(180deg, var(--canvas), var(--canvas-alt));
+    radial-gradient(circle at 12% 0%,  rgba(184, 92, 42, 0.18), transparent 35%),
+    radial-gradient(circle at 88% 10%, rgba(26, 74, 92, 0.15),  transparent 35%),
+    linear-gradient(160deg, var(--canvas), var(--canvas-alt));
   min-height: 100vh;
 }
 
@@ -31,4 +37,452 @@ body {
 h1,
 h2 {
   font-family: 'Fraunces', Georgia, serif;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 700; }
+h2 { font-size: clamp(1.25rem, 3vw, 1.75rem); font-weight: 600; }
+
+p {
+  color: var(--text);
+  max-width: 65ch;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--accent-cool);
+}
+
+/* =========================================
+   Layout Utilities
+========================================= */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.row > * {
+  flex: 1; /* Ensures side-by-side elements take equal space */
+}
+
+/* =========================================
+   Card Elements
+========================================= */
+.card {
+  background-color: var(--surface);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 12px 36px rgba(44, 54, 57, 0.06),
+              0 2px 6px rgba(44, 54, 57, 0.03);
+  border: 1px solid var(--line);
+}
+
+.page-card {
+  max-width: 640px;
+  margin: 4rem auto;
+  width: 92%;
+}
+
+.page-card h2 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--accent-cool); /* Ties into your cool accent for headers */
+}
+
+/* =========================================
+   Form Controls
+========================================= */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text);
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 0.875rem 1.25rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  outline: none;
+}
+
+textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* Focus States */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-cool);
+  box-shadow: 0 0 0 4px rgba(26, 74, 92, 0.1); /* Soft glow using accent-cool */
+}
+
+/* =========================================
+   Button Styling
+========================================= */
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background-color: var(--accent);
+  border: none;
+  border-radius: 10px;
+  padding: 1.125rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  margin-top: 1rem;
+}
+
+button:hover {
+  background-color: #9c4c21; /* Slightly darker terracotta */
+  box-shadow: 0 4px 12px rgba(184, 92, 42, 0.2);
+}
+
+button:active {
+  transform: scale(0.98); /* Satisfying click effect */
+}
+
+/* =========================================
+   Summary / Feedback Message
+========================================= */
+.summary {
+  margin-top: 2rem;
+  padding: 1.25rem 1.5rem;
+  background-color: rgba(184, 92, 42, 0.08); /* Uses your terracotta with low opacity */
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+.summary p {
+  margin: 0;
+  color: var(--text);
+}
+
+/* Simple animation for when the success message appears */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   Home Page Grid Layout
+========================================= */
+.grid {
+  display: grid;
+  gap: 2.5rem;
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Responsive 2-column layout that collapses to 1 column on mobile */
+.two-up {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+/* Ensure the cards stretch to equal heights in the grid */
+.grid .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Pushes the bottom `.row` (with the buttons) to the bottom of the card */
+.grid .card .row {
+  margin-top: auto; 
+}
+
+/* =========================================
+   Custom Ordered Lists (Steps)
+========================================= */
+.steps {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 1.5rem 0 3rem; /* Extra space at the bottom before buttons */
+  counter-reset: step-counter;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.steps li {
+  position: relative;
+  padding-left: 3.5rem;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem; /* Ensures single-line text aligns nicely with the number */
+}
+
+/* Custom numbers using your Fraunces font and cool-accent color */
+.steps li::before {
+  content: counter(step-counter);
+  counter-increment: step-counter;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%); /* Perfectly centers the circle */
+  width: 2.25rem;
+  height: 2.25rem;
+  background-color: rgba(26, 74, 92, 0.08); /* Soft teal background */
+  color: var(--accent-cool);
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* =========================================
+   Button Links (React Router)
+========================================= */
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  background-color: var(--accent);
+  border: none;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  text-decoration: none; /* Removes underline from the <a> tag */
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  text-align: center;
+  flex: 1; /* Makes multiple buttons side-by-side equal width */
+}
+
+.button-link:hover {
+  background-color: #9c4c21; /* Slightly darker terracotta */
+  box-shadow: 0 4px 12px rgba(184, 92, 42, 0.2);
+  color: #FFFFFF; /* Ensures the text stays white, overriding your default a:hover */
+}
+
+.button-link:active {
+  transform: scale(0.98);
+}
+
+/* Specific styling for the helper text next to the button in the Attendee flow */
+.card .row p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+  flex: 1.5; /* Gives the text a bit more breathing room than the button */
+}
+
+
+
+/* =========================================
+   Secondary Button Variant
+========================================= */
+.button-secondary {
+  background-color: transparent;
+  color: var(--accent);
+  /* Using an inset box-shadow instead of border prevents the button from shifting sizes */
+  box-shadow: inset 0 0 0 1.5px var(--accent); 
+}
+
+.button-secondary:hover {
+  background-color: rgba(184, 92, 42, 0.06); /* A very faint terracotta wash */
+  box-shadow: inset 0 0 0 1.5px var(--accent); /* Keeps the border intact without the heavy drop shadow */
+  color: var(--accent); /* Overrides the white color from the primary button hover */
+}
+
+/* =========================================
+   Page Card Modifiers
+========================================= */
+/* Expands the max-width to accommodate the 6-column data table */
+.page-card.wide {
+  max-width: 1000px;
+}
+
+.page-card.wide .row {
+  margin-bottom: 1.5rem; /* Adds breathing room below the refresh button */
+}
+
+/* =========================================
+   Data Tables
+========================================= */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto; /* Ensures the table scrolls horizontally on small screens */
+  background-color: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(44, 54, 57, 0.02);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* Prevents the columns from squishing together */
+}
+
+th, td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+th {
+  background-color: rgba(26, 74, 92, 0.06); /* A very soft wash of your deep teal */
+  color: var(--accent-cool);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Removes the extra border at the very bottom of the table */
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* Row hover states */
+tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+  background-color: rgba(184, 92, 42, 0.04); /* A soft terracotta wash */
+}
+
+/* Empty State Styling (When no events are loaded) */
+td[colspan="6"] {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 4rem 1rem;
+  font-style: italic;
+  background-color: var(--surface);
+}
+
+/* Truncate very long share links so they don't break the table layout */
+td a {
+  display: inline-block;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+/* =========================================
+   Table Action Buttons
+========================================= */
+/* Overrides the standard .row behavior so these specific buttons don't stretch */
+.row.actions {
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.row.actions > * {
+  flex: 0 1 auto; 
+}
+
+/* Base style for small inline buttons */
+.action-button {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0; /* Overrides the 1rem margin-top from standard buttons */
+}
+
+/* -------------------------
+   Approve Action (Teal)
+------------------------- */
+.action-button.approve {
+  color: var(--accent-cool);
+  box-shadow: inset 0 0 0 1.5px var(--accent-cool);
+}
+
+.action-button.approve:hover:not(:disabled) {
+  background-color: rgba(26, 74, 92, 0.08); /* Soft teal wash */
+}
+
+.action-button.approve.is-active {
+  background-color: var(--accent-cool);
+  color: #FFFFFF;
+}
+
+/* -------------------------
+   Reject & Revoke (Terracotta)
+------------------------- */
+.action-button.reject,
+.action-button.revoke {
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.action-button.reject:hover:not(:disabled),
+.action-button.revoke:hover:not(:disabled) {
+  background-color: rgba(184, 92, 42, 0.08); /* Soft terracotta wash */
+}
+
+.action-button.reject.is-active,
+.action-button.revoke.is-active {
+  background-color: var(--accent);
+  color: #FFFFFF;
+}
+
+/* -------------------------
+   Disabled / Inactive States
+------------------------- */
+.action-button:disabled {
+  cursor: default;
+}
+
+/* If a button is disabled AND not active, mute it out so the active state stands out */
+.action-button:disabled:not(.is-active) {
+  opacity: 0.4;
+  color: var(--text-muted);
+  box-shadow: inset 0 0 0 1.5px var(--line);
 }
