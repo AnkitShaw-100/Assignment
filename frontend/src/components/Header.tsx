@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Search, ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 
@@ -11,9 +12,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border/60">
       <div className="mx-auto max-w-7xl px-6 lg:px-10 h-16 md:h-20 flex items-center justify-between">
-        <a href="/" className="font-display text-2xl md:text-3xl font-medium text-espresso">
+        <Link to="/" className="font-display text-2xl md:text-3xl font-medium text-espresso">
           Orna<span className="text-gold">.</span>
-        </a>
+        </Link>
 
         <nav className="hidden md:flex items-center gap-10 text-xs tracking-luxury uppercase text-foreground/80">
           {nav.map((n) => (

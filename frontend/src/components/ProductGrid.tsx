@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { products, type Product } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
-import { ProductModal } from "./ProductModal";
+
+const ProductModal = lazy(() =>
+  import("./ProductModal").then((module) => ({ default: module.ProductModal })),
+);
 
 export function ProductGrid() {
   const [active, setActive] = useState<Product | null>(null);
@@ -22,7 +25,9 @@ export function ProductGrid() {
         ))}
       </div>
 
-      <ProductModal product={active} onClose={() => setActive(null)} />
+      <Suspense fallback={null}>
+        <ProductModal product={active} onClose={() => setActive(null)} />
+      </Suspense>
     </section>
   );
 }
