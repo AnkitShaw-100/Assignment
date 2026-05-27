@@ -20,14 +20,14 @@ const SKETCHFAB_MODELS: Record<Category, { title: string; embedUrl: string }> = 
       "https://sketchfab.com/models/40509546dc084521a0d4e7da5dd9bfe6/embed?autostart=1&transparent=1&ui_infos=0&ui_controls=1&ui_watermark=0",
   },
   Earrings: {
-    title: "Sketchfab earring model",
+    title: "Gold Earrings",
     embedUrl:
-      "https://sketchfab.com/models/bbebf9ba7c31423aae8eacab300acd2a/embed?autostart=1&transparent=1&ui_infos=0&ui_controls=1&ui_watermark=0",
+      "https://sketchfab.com/models/fa51411b736a4306889e197226f1b806/embed?autostart=1&transparent=1&ui_infos=0&ui_controls=1&ui_watermark=0",
   },
   Bracelets: {
-    title: "Sketchfab bracelet model",
+    title: "Bracelet 1 (Rose)",
     embedUrl:
-      "https://sketchfab.com/models/f94cfec3414749cca9e54d76e1fd8134/embed?autostart=1&transparent=1&ui_infos=0&ui_controls=1&ui_watermark=0",
+      "https://sketchfab.com/models/f6c11eb4147d4b7794b53002c7aae288/embed?autostart=1&transparent=1&ui_infos=0&ui_controls=1&ui_watermark=0",
   },
 };
 
