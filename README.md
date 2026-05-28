@@ -64,20 +64,3 @@ frontend/
     pages/            Route pages
     styles.css        Tailwind theme and global styles
 ```
-
-## Assignment Submission
-
-Email subject:
-
-```text
-[M2M Intern Assignment] Your Name - Jewelry Website
-```
-
-Include:
-
-- Public GitHub repository link
-- 3-4 line description of the design approach and implementation
-
-Suggested description:
-
-Aurel is a luxury jewelry storefront focused on quiet editorial design, warm premium tones, refined typography, and interactive product exploration. The site includes responsive featured collection browsing, hover product actions, a 3D product modal, configurable jewelry options, and cart persistence during the session. The implementation uses React, TypeScript, Vite, Tailwind CSS, and componentized state management for a production-ready frontend structure.
