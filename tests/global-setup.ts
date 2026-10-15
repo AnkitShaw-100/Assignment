@@ -19,6 +19,7 @@ export default async function setup() {
 
   execSync("npx prisma migrate deploy", {
     stdio: "pipe",
-    env: { ...process.env, DATABASE_URL: url.toString() },
+    // Override DIRECT_URL too, or prisma.config.ts would migrate the real database.
+    env: { ...process.env, DATABASE_URL: url.toString(), DIRECT_URL: url.toString() },
   });
 }

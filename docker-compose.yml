@@ -1,11 +1,14 @@
 services:
+  # Local PostgreSQL for tests and offline development. The app itself uses
+  # Supabase (DATABASE_URL / DIRECT_URL in .env).
   db:
     image: postgres:17-alpine
+    profiles: ["local-db"]
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_USER: ${POSTGRES_USER:-leadflow}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
-      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-leadflow}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
@@ -16,19 +19,17 @@ services:
       timeout: 5s
       retries: 10
 
-  # One-off job: applies Prisma migrations, then exits. Also used for seeding:
-  #   docker compose run --rm migrate npx prisma db seed
+  # One-off job: applies Prisma migrations to Supabase, then exits. Also seeds:
+  #   docker compose --profile app run --rm migrate npx prisma db seed
   migrate:
     build:
       context: .
       target: builder
     profiles: ["app"]
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL in .env}
+      DIRECT_URL: ${DIRECT_URL:?set DIRECT_URL in .env}
     command: ["npx", "prisma", "migrate", "deploy"]
-    depends_on:
-      db:
-        condition: service_healthy
 
   app:
     build:
@@ -37,12 +38,10 @@ services:
     profiles: ["app"]
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL in .env}
     ports:
       - "${APP_PORT:-3000}:3000"
     depends_on:
-      db:
-        condition: service_healthy
       migrate:
         condition: service_completed_successfully
 
