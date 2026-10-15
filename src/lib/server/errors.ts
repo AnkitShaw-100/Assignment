@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import type { ApiError } from "@/lib/leads/types";
 
@@ -76,6 +77,8 @@ export function handle<Args extends unknown[]>(fn: (...args: Args) => Promise<Re
     try {
       return await fn(...args);
     } catch (error) {
+      // Let Next.js control-flow errors (e.g. prerender bail-outs) propagate.
+      unstable_rethrow(error);
       return errorResponse(error);
     }
   };
