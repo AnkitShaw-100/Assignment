@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+model Lead {
+  id             String       @id @default(uuid()) @db.Uuid
+  name           String       @db.VarChar(120)
+  company        String?      @db.VarChar(120)
+  phone          String?      @db.VarChar(40)
+  status         LeadStatus   @default(NEW)
+  // The single "current" follow-up. Replaced (not appended) when a new
+  // discussion schedules one; history lives on Discussion.followUpAt.
+  nextFollowUpAt DateTime?    @db.Timestamptz(3)
+  // Denormalised timestamp of the newest discussion, kept in sync inside the
+  // same transaction that inserts a discussion. Lets the list sort cheaply.
+  lastDiscussionAt DateTime?  @db.Timestamptz(3)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
+  discussions    Discussion[]
+
+  @@index([status])
+  @@index([nextFollowUpAt])
+  @@index([updatedAt])
+}
+
+model Discussion {
+  id         String    @id @default(uuid()) @db.Uuid
+  leadId     String    @db.Uuid
+  note       String    @db.Text
+  followUpAt DateTime? @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  lead       Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt(sort: Desc)])
+}
