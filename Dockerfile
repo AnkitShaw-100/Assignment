@@ -17,7 +17,8 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" \
-    NEXT_TELEMETRY_DISABLED=1
+    NEXT_TELEMETRY_DISABLED=1 \
+    NEXT_OUTPUT=standalone
 RUN npx prisma generate && npm run build
 # Used by the `migrate` service; the real DATABASE_URL is supplied at runtime.
 ENV DATABASE_URL=""

@@ -19,13 +19,27 @@ A lightweight CRM for sales reps: track leads through the pipeline, log every co
 - **Immediate UI updates** after every change, with toast notifications. Buttons are disabled while a request is in flight, so you can't submit twice.
 - **Responsive and accessible**: a table on desktop and compact cards on mobile. Rows and controls are keyboard-operable, focus is visible, and dialogs are accessible (Radix). Includes loading, empty, and error states.
 
+## Screenshots
+
+| Dashboard: today's follow-ups pinned, overdue in red | Lead timeline dialog |
+| --- | --- |
+| ![Dashboard](docs/screenshots/01-dashboard.png) | ![Timeline](docs/screenshots/03-lead-timeline.png) |
+| **Status update from the dialog** | **Add a discussion with a follow-up** |
+| ![Status update](docs/screenshots/04-status-update.png) | ![Discussion with follow-up](docs/screenshots/06-discussion-with-follow-up.png) |
+| **List updates immediately** | **Add lead** |
+| ![List updated](docs/screenshots/07-list-updated.png) | ![Add lead](docs/screenshots/05-add-lead.png) |
+| **Search + status filter** | **Validation** |
+| ![Search and filter](docs/screenshots/02-search-and-filter.png) | ![Validation](docs/screenshots/08-validation.png) |
+
+The mobile layout is in [docs/screenshots/09-mobile.png](docs/screenshots/09-mobile.png).
+
 ## Tech stack
 
 | Concern | Choice |
 | --- | --- |
 | Framework | Next.js 16 (App Router, Route Handlers), React 19, TypeScript |
 | Styling / UI | Tailwind CSS v4, shadcn/ui (Radix), Lucide icons, Sonner toasts |
-| Database | PostgreSQL 17 via Prisma ORM 7 (`@prisma/adapter-pg`) |
+| Database | **Supabase** (managed PostgreSQL 17) via Prisma ORM 7 (`@prisma/adapter-pg`); local Docker Postgres for tests |
 | Validation | Zod 4, with the same schemas on client and server |
 | Dates | date-fns |
 | Tests | Vitest (unit tests and API tests against a real Postgres test database) |
@@ -70,7 +84,8 @@ The code is organized in layers:
 
 - Node.js **20.19+** (developed on Node 22)
 - npm 10+
-- Docker with Docker Compose v2 (for PostgreSQL), or any PostgreSQL 14+ server you can reach
+- A **Supabase** project (the free tier is enough), or any PostgreSQL 14+ server
+- Docker with Docker Compose v2, used for the local test database and the optional container build
 
 ## Environment variables
 
@@ -80,26 +95,29 @@ Copy the example file and adjust the placeholders:
 cp .env.example .env        # Windows (cmd): copy .env.example .env
 ```
 
-| Variable | Purpose |
-| --- | --- |
-| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Credentials used by the Compose `db` service |
-| `POSTGRES_PORT` | Host port for Postgres (default `5432`) |
-| `DATABASE_URL` | Connection string used by Prisma and the app. It must match the values above. |
-| `APP_PORT` | Host port for the containerized app (default `3000`) |
-| `TEST_DATABASE_URL` | *Optional.* Database for the test suite. Defaults to `DATABASE_URL` with `_test` appended to the database name. |
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | Database the **app** uses at runtime. On Supabase: the transaction-mode pooler (port `6543`) with `?pgbouncer=true`. |
+| `DIRECT_URL` | Yes for Supabase | Database the **Prisma CLI** uses for migrations and seeding. On Supabase: the session-mode pooler (port `5432`). If unset, Prisma falls back to `DATABASE_URL`. |
+| `TEST_DATABASE_URL` | For tests | A disposable **local** database for the test suite. Tests delete every row, so they refuse to run against a remote database. |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `POSTGRES_PORT` | For tests | Credentials and port for the local Compose `db` service. They must match `TEST_DATABASE_URL`. |
+| `APP_PORT` | No | Host port for the containerized app (default `3000`) |
+
+**Getting the Supabase URLs:** open your project, click **Connect → ORMs → Prisma**, and copy both connection strings. Replace `[YOUR-PASSWORD]` with your database password (reset it under **Project Settings → Database** if you don't have it). Use the exact pooler host shown there: it may be `aws-0-…` or `aws-1-…`, depending on the project.
 
 `.env` is git-ignored. No secrets are committed.
 
 ## Local development
 
 ```bash
-cp .env.example .env              # 1. configure (then edit the password)
-docker compose up -d db           # 2. start PostgreSQL only
-npm install                       # 3. install deps (postinstall runs `prisma generate`)
-npm run db:deploy                 # 4. apply migrations
-npm run db:seed                   # 5. load sample data (safe to rerun)
-npm run dev                       # 6. http://localhost:3000
+cp .env.example .env              # 1. fill in the Supabase URLs (see above)
+npm install                       # 2. install deps (postinstall runs `prisma generate`)
+npm run db:deploy                 # 3. apply migrations to Supabase
+npm run db:seed                   # 4. load sample data (safe to rerun)
+npm run dev                       # 5. http://localhost:3000
 ```
+
+**Without Supabase:** run `docker compose up -d db`, then point both `DATABASE_URL` and `DIRECT_URL` at `postgresql://leadflow:<password>@localhost:5432/leadflow?schema=public`. The steps above work unchanged.
 
 ### Database commands
 
@@ -123,13 +141,14 @@ npm start                         # serves on http://localhost:3000
 ## Testing and quality checks
 
 ```bash
-npm test             # Vitest: unit + API tests (needs Postgres running)
+docker compose up -d db   # local Postgres for the test database
+npm test             # Vitest: unit + API tests
 npm run lint         # ESLint (next/core-web-vitals + TypeScript)
-npm run typecheck    # tsc --noEmit
+npm run typecheck    # next typegen + tsc --noEmit
 npm run build        # production build
 ```
 
-The API tests call the route handlers directly against a **separate database** (`<db>_test`). The test setup creates it if it doesn't exist and applies migrations, so development data is never touched. The configured database user must be allowed to create databases (the Compose superuser is). Otherwise, create the database yourself and set `TEST_DATABASE_URL`.
+The API tests call the route handlers directly against `TEST_DATABASE_URL`, a local Postgres database. The test setup creates it if it doesn't exist and applies migrations. Tests **never** touch Supabase: if `TEST_DATABASE_URL` is unset and `DATABASE_URL` is remote, the suite refuses to run.
 
 What the tests cover:
 
@@ -143,23 +162,23 @@ What the tests cover:
 
 ## Docker Compose
 
-The `db` service always runs. The `migrate` job and the `app` service run under the `app` profile.
+The containerized app connects to Supabase using `DATABASE_URL` and `DIRECT_URL` from `.env`. The `migrate` job and the `app` service run under the `app` profile. The local `db` service is only for tests and offline work.
 
 ```bash
-cp .env.example .env                                        # if not done yet
-docker compose --profile app up -d --build                  # db → migrate → app
+docker compose --profile app up -d --build                  # migrate → app
 docker compose --profile app run --rm migrate npx prisma db seed   # optional sample data
 # open http://localhost:3000
 
 docker compose --profile app logs -f app                    # follow logs
-docker compose --profile app down                           # stop (data kept in the pgdata volume)
-docker compose --profile app down -v                        # stop and delete all data
+docker compose --profile app down                           # stop the app
+
+docker compose up -d db                                     # local Postgres for tests
+docker compose down -v                                      # stop it and delete its data
 ```
 
-- Postgres has a `pg_isready` health check.
 - `migrate` runs `prisma migrate deploy` and exits.
-- `app` starts only after the database is healthy **and** migrations have succeeded. It also has its own HTTP health check.
-- For local development, run only the database: `docker compose up -d db`.
+- `app` starts only after migrations have succeeded, and has its own HTTP health check.
+- The local `db` service has a `pg_isready` health check and keeps its data in the `pgdata` volume.
 
 ## API
 
@@ -270,7 +289,18 @@ Returns `{ total, byStatus, dueToday, overdue }`. The client sends the bounds of
 - **`Lead.lastDiscussionAt`** is a denormalized timestamp. It is updated in the same transaction as the discussion insert, so the list can sort by recent activity without aggregating.
 - **No N+1 queries.** The list loads each lead's latest discussion and discussion count through a single Prisma `select`, which Prisma batches.
 - **Data fetching** is client-side against the REST API: the page is a static shell, and the dashboard fetches and refetches after each change. Responses for superseded requests are aborted, so a fast typist never sees stale results.
+- **Supabase connections.** The app uses the transaction-mode pooler, which suits many short-lived connections. Prisma migrations use the session-mode pooler, because they need a session-level connection. Supabase's direct host is IPv6-only, which many networks can't reach.
+- **Row Level Security** is enabled on every table (a migration does this). Supabase exposes the `public` schema through its REST API with a public anon key, and RLS with no policies blocks that path entirely. The app connects through Prisma as the table owner, so RLS doesn't affect it.
 - **FastAI is not used.** The required CRM features don't need ML, so no artificial AI features were added.
+
+## AI usage
+
+This project was built with an AI coding assistant (Claude Code), as the brief encourages. The assistant wrote most of the code, tests, Docker setup and this README, following a detailed specification I provided. I reviewed the work and verified it by running:
+
+- the automated test suite (`npm test`), lint, type checking and the production build;
+- scripted browser runs of every flow (search, each status filter, add lead, duplicate phone, add discussion with follow-up, status change, persistence after reload, mobile layout) against both the production build and the Docker image.
+
+Problems caught during that verification and fixed are visible in the commit history. One example: an API error wrapper that swallowed Next.js's internal prerender signal.
 
 ## Known limitations
 
